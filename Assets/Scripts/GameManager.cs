@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Microsoft.Unity.VisualStudio.Editor;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Image = UnityEngine.UI.Image;
@@ -12,7 +11,7 @@ using Image = UnityEngine.UI.Image;
 public class GameManager : MonoBehaviour
 {
     public ImageTimer HarvestTimer;
-    public ImageTimer eatingTimer;
+    public ImageTimer EatingTimer;
     
     public Image RaidTimerImg;
     public Image PeasantTimerImg;
@@ -23,7 +22,7 @@ public class GameManager : MonoBehaviour
     public Button warriorButton;
 
 
-    public TMP_Text resoucesText;
+    public Text resourcesText;
 
     public int peasantCount;
     public int warriorsCount;
@@ -54,15 +53,20 @@ public class GameManager : MonoBehaviour
    
     void Update()
     {
-        if (HarvestTimer.Tick)
+
+
+        wheatCount += peasantCount * wheatPerPeasant;
+        wheatCount -= warriorsCount * wheatToWarriors;
+        /*if (HarvestTimer.Tick)
         {
             wheatCount += peasantCount * wheatPerPeasant;
         }
 
-        if (eatingTimer.Tick)
+        if (EatingTimer.Tick) 
         {
             wheatCount -= warriorsCount * wheatToWarriors;
-        }
+        }*/
+
         UpdateText();
     }
 
@@ -78,6 +82,6 @@ public class GameManager : MonoBehaviour
 
     private void UpdateText()
     {
-        resoucesText.text = peasantCount + "\n" + warriorsCount + "\n\n" + wheatCount;
+        resourcesText.text = peasantCount +"\n" + warriorsCount +"\n\n" + wheatCount;
     }
 }
