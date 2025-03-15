@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Microsoft.Unity.VisualStudio.Editor;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Image = UnityEngine.UI.Image;
@@ -10,6 +11,7 @@ using Image = UnityEngine.UI.Image;
 
 public class GameManager : MonoBehaviour
 {
+    public GameObject GameOverBack;
     public ImageTimer HarvestTimer;
     public ImageTimer EatingTimer;
     
@@ -48,36 +50,91 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         UpdateText();
+        raidTimer = raidMaxTime;
     }
 
    
     void Update()
     {
+        raidTimer -= Time.deltaTime;
+        RaidTimerImg.fillAmount = raidTimer / raidMaxTime;
+        if (raidTimer <= 0)
+        {
+            raidTimer = raidMaxTime;
+            warriorsCount -= nextRaid;
+            nextRaid += raidIncrease;
+        }
+        
 
-
-        wheatCount += peasantCount * wheatPerPeasant;
-        wheatCount -= warriorsCount * wheatToWarriors;
-        /*if (HarvestTimer.Tick)
+        if (HarvestTimer.Tick)
         {
             wheatCount += peasantCount * wheatPerPeasant;
         }
+        else if (HarvestTimer.Tick)
+        {
+            if(wheatCount < 4)
+            {
+                peasantButton.interactable = false;
+            }
+            else if(wheatCount < 8)
+            {
+                warriorButton.interactable = false;
+            }
+        }
 
-        if (EatingTimer.Tick) 
+        if (EatingTimer.Tick)
         {
             wheatCount -= warriorsCount * wheatToWarriors;
-        }*/
+        }
 
         UpdateText();
+
+
+        if (peasantTimer > 0)
+        {
+            peasantTimer -= Time.deltaTime;
+            PeasantTimerImg.fillAmount = peasantTimer / peasantCreateTime;
+        }
+        else if  (peasantTimer > -1)
+        {
+            PeasantTimerImg.fillAmount = 1;
+            peasantButton.interactable = true;
+            peasantCount += 1;
+            peasantTimer = -2;
+        }
+
+        if(warriorTimer > 0)
+        {
+            warriorTimer -= Time.deltaTime;
+            WarriorTimerImg.fillAmount = warriorTimer / warriorCreateTime;
+        }
+        else if (warriorTimer > -1)
+        {
+            WarriorTimerImg.fillAmount = 1;
+            warriorButton.interactable = true;
+            warriorsCount += 1;
+            warriorTimer = -2;
+        }
+
+        if (warriorsCount < 0 )
+        {
+            GameOverBack.SetActive(true);
+        }
     }
+
 
     public void CreatePeasant()
     {
-
+        wheatCount -= peasantCost;
+        peasantTimer = peasantCreateTime;
+        peasantButton.interactable = false;
     }
 
     public void CreateWarrior()
     {
-        
+        wheatCount -= warriorCost;
+        warriorTimer = warriorCreateTime;
+        warriorButton.interactable = false;
     }
 
     private void UpdateText()
