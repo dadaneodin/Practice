@@ -966,7 +966,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 44, y: -0.000061035156}
+  m_AnchoredPosition: {x: 44, y: 0}
   m_SizeDelta: {x: -1405.3533, y: -544.7298}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &559135845
@@ -2510,7 +2510,7 @@ MonoBehaviour:
   warriorCost: 8
   peasantCreateTime: 5
   warriorCreateTime: 8
-  raidMaxTime: 4
+  raidMaxTime: 20
   raidIncrease: 2
   nextRaid: 0
 --- !u!1 &2091277150

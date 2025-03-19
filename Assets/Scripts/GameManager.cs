@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -11,6 +12,7 @@ using Image = UnityEngine.UI.Image;
 
 public class GameManager : MonoBehaviour
 {
+    private const bool V = true;
     public GameObject GameOverBack;
     public ImageTimer HarvestTimer;
     public ImageTimer EatingTimer;
@@ -36,6 +38,8 @@ public class GameManager : MonoBehaviour
     public int peasantCost;
     public int warriorCost;
 
+    private bool Tick;
+
     public float peasantCreateTime;
     public float warriorCreateTime;
     public float raidMaxTime;
@@ -56,31 +60,37 @@ public class GameManager : MonoBehaviour
    
     void Update()
     {
-        raidTimer -= Time.deltaTime;
-        RaidTimerImg.fillAmount = raidTimer / raidMaxTime;
-        if (raidTimer <= 0)
         {
-            raidTimer = raidMaxTime;
-            warriorsCount -= nextRaid;
-            nextRaid += raidIncrease;
+            raidTimer -= Time.deltaTime;
+            RaidTimerImg.fillAmount = raidTimer / raidMaxTime;
+            if (raidTimer <= 0)
+            {
+                raidTimer = raidMaxTime;
+                warriorsCount -= nextRaid;
+                nextRaid += raidIncrease;
+                raidMaxTime += 7;
+            }
         }
-        
+
+        if(peasantButton)
+
+        if (wheatCount > 4)
+        {
+            peasantButton.interactable = true;
+            warriorButton.interactable = true;
+        }
+        if(wheatCount < 4)
+        {
+            peasantButton.interactable = false;
+            warriorButton.interactable = false;
+        }
+
 
         if (HarvestTimer.Tick)
         {
             wheatCount += peasantCount * wheatPerPeasant;
         }
-        else if (HarvestTimer.Tick)
-        {
-            if(wheatCount < 4)
-            {
-                peasantButton.interactable = false;
-            }
-            else if(wheatCount < 8)
-            {
-                warriorButton.interactable = false;
-            }
-        }
+        
 
         if (EatingTimer.Tick)
         {
@@ -89,11 +99,18 @@ public class GameManager : MonoBehaviour
 
         UpdateText();
 
+        if (Tick)
+        {
+            peasantButton.interactable = false;
+        }
+
 
         if (peasantTimer > 0)
         {
+            
             peasantTimer -= Time.deltaTime;
             PeasantTimerImg.fillAmount = peasantTimer / peasantCreateTime;
+            // peasantButton.interactable = false;
         }
         else if  (peasantTimer > -1)
         {
@@ -107,6 +124,7 @@ public class GameManager : MonoBehaviour
         {
             warriorTimer -= Time.deltaTime;
             WarriorTimerImg.fillAmount = warriorTimer / warriorCreateTime;
+            //warriorButton.interactable = false;
         }
         else if (warriorTimer > -1)
         {
@@ -115,23 +133,31 @@ public class GameManager : MonoBehaviour
             warriorsCount += 1;
             warriorTimer = -2;
         }
+        
+        
+        
 
         if (warriorsCount < 0 )
         {
             GameOverBack.SetActive(true);
         }
+            Tick = false;
     }
 
-
+        
     public void CreatePeasant()
     {
+        Tick = true;
         wheatCount -= peasantCost;
         peasantTimer = peasantCreateTime;
         peasantButton.interactable = false;
     }
 
+
+
     public void CreateWarrior()
     {
+        Tick = true;
         wheatCount -= warriorCost;
         warriorTimer = warriorCreateTime;
         warriorButton.interactable = false;
