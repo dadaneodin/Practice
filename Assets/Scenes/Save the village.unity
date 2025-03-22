@@ -2511,7 +2511,7 @@ MonoBehaviour:
   peasantCreateTime: 5
   warriorCreateTime: 8
   raidMaxTime: 20
-  raidIncrease: 2
+  raidIncrease: 1
   nextRaid: 0
 --- !u!1 &2091277150
 GameObject:
