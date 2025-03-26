@@ -25,6 +25,9 @@ public class GameManager : MonoBehaviour
     public Button warriorButton;
 
 
+
+
+
     public Text resourcesText;
 
     public int peasantCount;
@@ -37,7 +40,8 @@ public class GameManager : MonoBehaviour
     public int peasantCost;
     public int warriorCost;
 
-    private bool Tick;
+    // private bool Tick;
+
 
     public float peasantCreateTime;
     public float warriorCreateTime;
@@ -54,6 +58,8 @@ public class GameManager : MonoBehaviour
     {
         UpdateText();
         raidTimer = raidMaxTime;
+
+        // harvest = GetComponent<AudioSource>();
     }
 
    
@@ -74,6 +80,7 @@ void Update()
         wheatCount += peasantCount * wheatPerPeasant;
     }
 
+    
     if (EatingTimer.Tick)
     {
         wheatCount -= warriorsCount * wheatToWarriors;
@@ -117,7 +124,6 @@ void Update()
         
     public void CreatePeasant()
     {
-        Tick = true;
         wheatCount -= peasantCost;
         peasantTimer = peasantCreateTime;
         peasantButton.interactable = false;

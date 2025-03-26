@@ -9,6 +9,7 @@ public class HarvestTimer : MonoBehaviour
 {
     public float MaxTime;
     public  bool Tick;
+    private AudioSource harvest;
 
     private Image img;
     private float currentTime;
@@ -17,6 +18,7 @@ public class HarvestTimer : MonoBehaviour
     {
         img = GetComponent<Image>();
         currentTime = MaxTime;
+        harvest = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -28,9 +30,15 @@ public class HarvestTimer : MonoBehaviour
         {
             Tick = true;
             currentTime = MaxTime;
+            harvest.Play();
         }
         
         img.fillAmount = currentTime/MaxTime;
+
+        
              
     }
+
+
+    
 }
