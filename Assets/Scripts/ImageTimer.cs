@@ -8,20 +8,21 @@ public class ImageTimer : MonoBehaviour
     public float MaxTime;
     public bool Tick;
     private AudioSource audioSource;
-
     private Image img;
     private float currentTime;
+    private bool TickSound = false;
 
     void Start()
     {
         img = GetComponent<Image>();
-        currentTime = MaxTime;
         audioSource = GetComponent<AudioSource>();
-        if(audioSource==null)
+
+        if (audioSource == null)
         {
-            Debug.Log(gameObject.name, gameObject);
+            Debug.LogWarning("audioSource нету на" + gameObject.name, gameObject);
         }
-    
+
+        currentTime = MaxTime * 0.99f;
     }
 
     void Update()
@@ -29,12 +30,20 @@ public class ImageTimer : MonoBehaviour
         Tick = false;
         currentTime -= Time.deltaTime;
 
-        if (currentTime <= 0) {
-            Tick = true;
+        if (currentTime <= 0)
+        {
+            if (TickSound)
+            {
+                Tick = true;
+                if (audioSource != null)
+                {
+                    audioSource.Play();
+                }
+            }
+            TickSound = true;
             currentTime = MaxTime;
-            if (audioSource !=null) 
-            audioSource.Play();
         }
-        img.fillAmount = currentTime / MaxTime;
+
+        img.fillAmount = Mathf.Clamp01(currentTime / MaxTime);
     }
 }

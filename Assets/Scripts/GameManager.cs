@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
         UpdateText();
         raidTimer = raidMaxTime;
 
-        // harvest = GetComponent<AudioSource>();
+        GetComponent<AudioSource>();
     }
 
    
@@ -69,10 +69,11 @@ void Update()
     RaidTimerImg.fillAmount = raidTimer / raidMaxTime;
     if (raidTimer <= 0)
     {
-        raidTimer = raidMaxTime;
         warriorsCount -= nextRaid;
         nextRaid += raidIncrease;
         raidMaxTime += 7;
+        raidTimer = raidMaxTime;
+
     }
 
     if (HarvestTimer.Tick)
@@ -117,6 +118,7 @@ void Update()
 
     if (warriorsCount < 0)
     {
+        warriorsCount = 0;
         GameOverBack.SetActive(true);
     }
 }
