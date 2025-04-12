@@ -2,43 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Supermen : MonoBehaviour
 {
     public float force;
 
 
+
     void FixUpdate()
     {
-        TimeToExplosion -= Time.deltaTime;
+        // TimeToExplosion -= Time.deltaTime;
     }
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision other)
     {
-        GameObject = collision.GameObject;
-
-        RigidBody rb = other.GetCommponent<RigidBody>();
-
-        Vector3 direction
-
-
-        if(other.layer == LayerMask.NameToLayer("BadGuy"))
+        if (other.gameObject)
         {
-            rb.AddForce(direction.normalized * force * (Radius - Vector3.Distance(transform.position, B.transform.position)), ForceMode.Impulse);
+            Rigidbody rigidbodyOther = other.gameObject.GetComponent<Rigidbody>();
+
+            // if (rigidbodyOther != null)
+            // {
+                Vector3 direction = rigidbodyOther.transform.position - transform.position;
+
+                rigidbodyOther.AddForce(direction.normalized * force * (Vector3.Distance(transform.position, rigidbodyOther.transform.position)), ForceMode.Impulse);
+            // }
         }
     }
-
-
-    //         if(Vector3.Distance(transform.position, B.transform.position) < Radius)
-    //         {
-    //             Vector3 direction = B.transform.position - transform.position;
-
-    //             B.AddForce(direction.normalized * Power * (Radius - Vector3.Distance(transform.position, B.transform.position)), ForceMode.Impulse);
-    //         }
-    //     }
-        
-    //     TimeToExplosion = 3;
-    //}
-
-
 
     private void FixedUpdate()
     {

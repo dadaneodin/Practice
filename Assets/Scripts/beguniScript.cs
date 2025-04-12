@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class mbeguniScript : MonoBehaviour
+public class beguniScript : MonoBehaviour
 {
     public Transform[] runners;
+    public Transform movementObject;
+    // public Transform newParent;
 
     public bool Go;
     public float Speed = 3;
@@ -24,6 +27,7 @@ public class mbeguniScript : MonoBehaviour
     {
         Transform current = runners[activeRunner];
         Transform next = runners[(activeRunner + 1) % runners.Length];
+        movementObject.SetParent(current, false);
 
         current.position = Vector3.MoveTowards(current.position, next.position, Speed * Time.deltaTime);
 
