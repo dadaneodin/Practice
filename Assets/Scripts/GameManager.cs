@@ -13,22 +13,22 @@ using Image = UnityEngine.UI.Image;
 public class GameManager : MonoBehaviour
 {
     public GameObject GameOverBack;
+    public GameObject WinBack;
+    public GameObject PauseMenu;
     public ImageTimer HarvestTimer;
     public ImageTimer EatingTimer;
-    
+
     public Image RaidTimerImg;
     public Image PeasantTimerImg;
     public Image WarriorTimerImg;
-    
 
     public Button peasantButton;
     public Button warriorButton;
-
-
-
-
+    public Button pauseButt;
+    public Button soundButt;
 
     public Text resourcesText;
+    public Text soundButtText;
 
     public int peasantCount;
     public int warriorsCount;
@@ -40,7 +40,13 @@ public class GameManager : MonoBehaviour
     public int peasantCost;
     public int warriorCost;
 
-    // private bool Tick;
+    public AudioSource audioSource;
+    public AudioClip harvestSound;
+    public AudioClip raidSound;
+    public AudioClip peasantSound;
+    public AudioClip warriorsSound;
+    public AudioClip eatSound;
+
 
 
     public float peasantCreateTime;
@@ -48,23 +54,31 @@ public class GameManager : MonoBehaviour
     public float raidMaxTime;
     public int raidIncrease;
     public int nextRaid;
+    public int wheatForWin = 500;
 
     private float peasantTimer = -2;
     private float warriorTimer = -2;
     private float raidTimer;
+    private bool isPaused = false;
+    private bool soundEnabled = true;
 
 
     void Start()
     {
         UpdateText();
         raidTimer = raidMaxTime;
-
-        GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
+        soundButtText.text = soundEnabled ? "ВКЛ" : "ВЫКЛ";
+        GameOverBack.SetActive(true);
+        PauseMenu.SetActive(false);
+        WinBack.SetActive(false);
     }
 
    
 void Update()
 {
+    if (isPaused) return;
+
     raidTimer -= Time.deltaTime;
     RaidTimerImg.fillAmount = raidTimer / raidMaxTime;
     if (raidTimer <= 0)
@@ -73,18 +87,22 @@ void Update()
         nextRaid += raidIncrease;
         raidMaxTime += 7;
         raidTimer = raidMaxTime;
-
+        PlaySound(raidSound);
     }
 
     if (HarvestTimer.Tick)
     {
         wheatCount += peasantCount * wheatPerPeasant;
+        if(peasantCount > 0)
+        PlaySound(harvestSound);
     }
 
     
     if (EatingTimer.Tick)
     {
         wheatCount -= warriorsCount * wheatToWarriors;
+        if(warriorsCount > 0)
+        PlaySound(eatSound);
     }
 
     UpdateText();
@@ -99,6 +117,7 @@ void Update()
         PeasantTimerImg.fillAmount = 1;
         peasantCount += 1;
         peasantTimer = -2;
+        PlaySound(peasantSound);
     }
 
     if (warriorTimer > 0)
@@ -111,6 +130,7 @@ void Update()
         WarriorTimerImg.fillAmount = 1;
         warriorsCount += 1;
         warriorTimer = -2;
+        PlaySound(warriorsSound);
     }
 
     peasantButton.interactable = (wheatCount >= 4 && peasantTimer <= -1);
@@ -120,6 +140,12 @@ void Update()
     {
         warriorsCount = 0;
         GameOverBack.SetActive(true);
+        Time.timeScale = 0;
+    }
+    if (wheatCount >= wheatForWin)
+    {
+        WinBack.SetActive(true);
+        Time.timeScale = 0;
     }
 }
 
@@ -143,5 +169,35 @@ void Update()
     private void UpdateText()
     {
         resourcesText.text = peasantCount +"\n" + warriorsCount +"\n\n" + wheatCount;
+    }
+
+    public void TogglePause()
+    {
+        isPaused = !isPaused;
+        PauseMenu.SetActive(isPaused);
+        Time.timeScale = isPaused ? 0 : 1;
+    }
+
+    public void ToggleSound()
+    {
+        soundEnabled = !soundEnabled;
+        audioSource.mute = !soundEnabled;
+        soundButtText.text = soundEnabled ? "ВКЛ" : "ВЫКЛ";
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        if(soundEnabled && clip != null)
+            {
+                audioSource.PlayOneShot(clip);
+            }
+    }
+
+    public void ResumeGame()
+    {
+        isPaused = false;
+        PauseMenu.SetActive(false);
+        Time.timeScale = 1;
+    
     }
 }
