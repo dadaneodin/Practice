@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using Microsoft.Unity.VisualStudio.Editor;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using UnityEngine.UI;
 using Image = UnityEngine.UI.Image;
 
@@ -55,7 +56,6 @@ public class GameManager : MonoBehaviour
     public int raidIncrease;
     public int nextRaid;
     public int wheatForWin = 500;
-
     private float peasantTimer = -2;
     private float warriorTimer = -2;
     private float raidTimer;
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
         raidTimer = raidMaxTime;
         audioSource = GetComponent<AudioSource>();
         soundButtText.text = soundEnabled ? "ВКЛ" : "ВЫКЛ";
-        GameOverBack.SetActive(true);
+        GameOverBack.SetActive(false);
         PauseMenu.SetActive(false);
         WinBack.SetActive(false);
     }
@@ -77,8 +77,8 @@ public class GameManager : MonoBehaviour
    
 void Update()
 {
+    // Debug.Log(GetComponent<AudioSource>() !=null);
     if (isPaused) return;
-
     raidTimer -= Time.deltaTime;
     RaidTimerImg.fillAmount = raidTimer / raidMaxTime;
     if (raidTimer <= 0)
@@ -90,7 +90,7 @@ void Update()
         PlaySound(raidSound);
     }
 
-    if (HarvestTimer.Tick)
+    if (HarvestTimer.Tick && peasantCost > 0)
     {
         wheatCount += peasantCount * wheatPerPeasant;
         if(peasantCount > 0)
@@ -98,14 +98,12 @@ void Update()
     }
 
     
-    if (EatingTimer.Tick)
+    if (EatingTimer.Tick && warriorCost > 0)
     {
         wheatCount -= warriorsCount * wheatToWarriors;
         if(warriorsCount > 0)
         PlaySound(eatSound);
     }
-
-    UpdateText();
 
     if (peasantTimer > 0)
     {
@@ -133,23 +131,27 @@ void Update()
         PlaySound(warriorsSound);
     }
 
-    peasantButton.interactable = (wheatCount >= 4 && peasantTimer <= -1);
-    warriorButton.interactable = (wheatCount >= 8 && warriorTimer <= -1);
+    // peasantButton.interactable = true;
+    // warriorButton.interactable = true;
 
-    if (warriorsCount < 0)
+    peasantButton.interactable = (wheatCount >=  peasantCost && peasantTimer <= -1);
+    warriorButton.interactable = (wheatCount >= warriorCost && warriorTimer <= -1);
+
+    if (warriorsCount <= 0 && !GameOverBack.activeSelf)
     {
         warriorsCount = 0;
         GameOverBack.SetActive(true);
         Time.timeScale = 0;
     }
-    if (wheatCount >= wheatForWin)
+    if (wheatCount >= wheatForWin && !WinBack.activeSelf)
     {
         WinBack.SetActive(true);
         Time.timeScale = 0;
     }
+
+    UpdateText();
 }
 
-        
     public void CreatePeasant()
     {
         wheatCount -= peasantCost;
@@ -157,18 +159,11 @@ void Update()
         peasantButton.interactable = false;
     }
 
-
-
     public void CreateWarrior()
     {
         wheatCount -= warriorCost;
         warriorTimer = warriorCreateTime;
         warriorButton.interactable = false;
-    }
-
-    private void UpdateText()
-    {
-        resourcesText.text = peasantCount +"\n" + warriorsCount +"\n\n" + wheatCount;
     }
 
     public void TogglePause()
@@ -181,16 +176,21 @@ void Update()
     public void ToggleSound()
     {
         soundEnabled = !soundEnabled;
-        audioSource.mute = !soundEnabled;
         soundButtText.text = soundEnabled ? "ВКЛ" : "ВЫКЛ";
+        AudioListener.volume = soundEnabled ? 1f : 0f;
     }
 
     private void PlaySound(AudioClip clip)
     {
-        if(soundEnabled && clip != null)
+        if(soundEnabled && clip != null && audioSource != null)
             {
                 audioSource.PlayOneShot(clip);
             }
+    }
+
+        private void UpdateText()
+    {
+        resourcesText.text = peasantCount +"\n" + warriorsCount +"\n\n" + wheatCount;
     }
 
     public void ResumeGame()
@@ -198,6 +198,5 @@ void Update()
         isPaused = false;
         PauseMenu.SetActive(false);
         Time.timeScale = 1;
-    
     }
 }
