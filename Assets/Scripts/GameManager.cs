@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     public Button warriorButton;
     public Button pauseButt;
     public Button soundButt;
+    public Button restartButton;
 
     public Text resourcesText;
     public Text soundButtText;
@@ -37,7 +38,7 @@ public class GameManager : MonoBehaviour
 
     public int wheatPerPeasant;
     public int wheatToWarriors;
-    
+
     public int peasantCost;
     public int warriorCost;
 
@@ -63,8 +64,22 @@ public class GameManager : MonoBehaviour
     private bool soundEnabled = true;
 
 
+    private int IntPeasantCount;
+    private int IntWarriorsCount;
+    private int IntWheatCount;
+    private float intRaidMaxTime;
+    private int IntNextRaid;
+
     void Start()
     {
+        //дада
+        IntPeasantCount = peasantCount;
+        IntWarriorsCount = warriorsCount;
+        IntWheatCount = wheatCount;
+        intRaidMaxTime = raidMaxTime;
+        IntNextRaid = nextRaid;
+
+
         UpdateText();
         raidTimer = raidMaxTime;
         audioSource = GetComponent<AudioSource>();
@@ -74,83 +89,83 @@ public class GameManager : MonoBehaviour
         WinBack.SetActive(false);
     }
 
-   
-void Update()
-{
-    // Debug.Log(GetComponent<AudioSource>() !=null);
-    if (isPaused) return;
-    raidTimer -= Time.deltaTime;
-    RaidTimerImg.fillAmount = raidTimer / raidMaxTime;
-    if (raidTimer <= 0)
-    {
-        warriorsCount -= nextRaid;
-        nextRaid += raidIncrease;
-        raidMaxTime += 7;
-        raidTimer = raidMaxTime;
-        PlaySound(raidSound);
-    }
 
-    if (HarvestTimer.Tick && peasantCost > 0)
+    void Update()
     {
-        wheatCount += peasantCount * wheatPerPeasant;
-        if(peasantCount > 0)
-        PlaySound(harvestSound);
-    }
+        // Debug.Log(GetComponent<AudioSource>() !=null);
+        if (isPaused) return;
+        raidTimer -= Time.deltaTime;
+        RaidTimerImg.fillAmount = raidTimer / raidMaxTime;
+        if (raidTimer <= 0)
+        {
+            warriorsCount -= nextRaid;
+            nextRaid += raidIncrease;
+            raidMaxTime += 7;
+            raidTimer = raidMaxTime;
+            PlaySound(raidSound);
+        }
 
-    
-    if (EatingTimer.Tick && warriorCost > 0)
-    {
-        wheatCount -= warriorsCount * wheatToWarriors;
-        if(warriorsCount > 0)
-        PlaySound(eatSound);
-    }
+        if (HarvestTimer.Tick && peasantCost > 0)
+        {
+            wheatCount += peasantCount * wheatPerPeasant;
+            if (peasantCount > 0)
+                PlaySound(harvestSound);
+        }
 
-    if (peasantTimer > 0)
-    {
-        peasantTimer -= Time.deltaTime;
-        PeasantTimerImg.fillAmount = peasantTimer / peasantCreateTime;
-    }
-    else if (peasantTimer > -1)
-    {
-        PeasantTimerImg.fillAmount = 1;
-        peasantCount += 1;
-        peasantTimer = -2;
-        PlaySound(peasantSound);
-    }
 
-    if (warriorTimer > 0)
-    {
-        warriorTimer -= Time.deltaTime;
-        WarriorTimerImg.fillAmount = warriorTimer / warriorCreateTime;
-    }
-    else if (warriorTimer > -1)
-    {
-        WarriorTimerImg.fillAmount = 1;
-        warriorsCount += 1;
-        warriorTimer = -2;
-        PlaySound(warriorsSound);
-    }
+        if (EatingTimer.Tick && warriorCost > 0)
+        {
+            wheatCount -= warriorsCount * wheatToWarriors;
+            if (warriorsCount > 0)
+                PlaySound(eatSound);
+        }
 
-    // peasantButton.interactable = true;
-    // warriorButton.interactable = true;
+        if (peasantTimer > 0)
+        {
+            peasantTimer -= Time.deltaTime;
+            PeasantTimerImg.fillAmount = peasantTimer / peasantCreateTime;
+        }
+        else if (peasantTimer > -1)
+        {
+            PeasantTimerImg.fillAmount = 1;
+            peasantCount += 1;
+            peasantTimer = -2;
+            PlaySound(peasantSound);
+        }
 
-    peasantButton.interactable = (wheatCount >=  peasantCost && peasantTimer <= -1);
-    warriorButton.interactable = (wheatCount >= warriorCost && warriorTimer <= -1);
+        if (warriorTimer > 0)
+        {
+            warriorTimer -= Time.deltaTime;
+            WarriorTimerImg.fillAmount = warriorTimer / warriorCreateTime;
+        }
+        else if (warriorTimer > -1)
+        {
+            WarriorTimerImg.fillAmount = 1;
+            warriorsCount += 1;
+            warriorTimer = -2;
+            PlaySound(warriorsSound);
+        }
 
-    if (warriorsCount <= 0 && !GameOverBack.activeSelf)
-    {
-        warriorsCount = 0;
-        GameOverBack.SetActive(true);
-        Time.timeScale = 0;
+        // peasantButton.interactable = true;
+        // warriorButton.interactable = true;
+
+        peasantButton.interactable = (wheatCount >= peasantCost && peasantTimer <= -1);
+        warriorButton.interactable = (wheatCount >= warriorCost && warriorTimer <= -1);
+
+        if (warriorsCount <= 0 && !GameOverBack.activeSelf)
+        {
+            warriorsCount = 0;
+            GameOverBack.SetActive(true);
+            Time.timeScale = 0;
+        }
+        if (wheatCount >= wheatForWin && !WinBack.activeSelf)
+        {
+            WinBack.SetActive(true);
+            Time.timeScale = 0;
+        }
+
+        UpdateText();
     }
-    if (wheatCount >= wheatForWin && !WinBack.activeSelf)
-    {
-        WinBack.SetActive(true);
-        Time.timeScale = 0;
-    }
-
-    UpdateText();
-}
 
     public void CreatePeasant()
     {
@@ -182,15 +197,15 @@ void Update()
 
     private void PlaySound(AudioClip clip)
     {
-        if(soundEnabled && clip != null && audioSource != null)
-            {
-                audioSource.PlayOneShot(clip);
-            }
+        if (soundEnabled && clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
     }
 
-        private void UpdateText()
+    private void UpdateText()
     {
-        resourcesText.text = peasantCount +"\n" + warriorsCount +"\n\n" + wheatCount;
+        resourcesText.text = peasantCount + "\n" + warriorsCount + "\n\n" + wheatCount;
     }
 
     public void ResumeGame()
@@ -198,5 +213,45 @@ void Update()
         isPaused = false;
         PauseMenu.SetActive(false);
         Time.timeScale = 1;
+    }
+
+
+
+    public void RestartGame()
+    {
+        //dd
+        peasantCount = IntPeasantCount;
+        warriorsCount = IntWarriorsCount;
+        wheatCount = IntWheatCount;
+        raidMaxTime = intRaidMaxTime;
+        nextRaid = IntNextRaid;
+
+        //f
+        peasantTimer = -2;
+        warriorTimer = -2;
+        raidTimer = raidMaxTime;
+
+        //f
+        if (HarvestTimer != null)
+        {
+            HarvestTimer.ResetTimer();
+        }
+
+        if (EatingTimer != null)
+        {
+            EatingTimer.ResetTimer();
+        }
+        //up ui
+        UpdateText();
+        RaidTimerImg.fillAmount = 1;
+        PeasantTimerImg.fillAmount = 1;
+        WarriorTimerImg.fillAmount = 1;
+
+        //close back's
+        WinBack.SetActive(false);
+        GameOverBack.SetActive(false);
+        PauseMenu.SetActive(false);
+        Time.timeScale = 1;
+        isPaused = false;
     }
 }

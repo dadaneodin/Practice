@@ -46,4 +46,10 @@ public class ImageTimer : MonoBehaviour
 
         img.fillAmount = Mathf.Clamp01(currentTime / MaxTime);
     }
+
+        public void ResetTimer()
+    {
+        currentTime = 0;
+        Tick = false;
+    }
 }
